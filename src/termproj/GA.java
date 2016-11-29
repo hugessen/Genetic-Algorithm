@@ -1,0 +1,323 @@
+package termproj;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class GA
+{
+
+    int generation_counter; // the number of generations remaining
+    int max_value; // the maximum possible value for an individual
+    int min_value; // the minimum possible value for an individual
+    int bit_size; // the number of bits in an individual
+    int pop_size; // the number of individuals in a population
+    List<String> population; // the population, with each individual represented by a string
+    Random random = new Random(); // used to generate random numbers
+    ObjectiveFunction objective_function; // a function to determine an individuals fitness
+    boolean maximize; // true if we are maximizing the objective function, false if we are minimizing it
+
+    /**
+     * Constructor for GA class
+     *
+     * @param generation_counter the total number of generations
+     * @param max_value the maximum possible value for an individual
+     * @param min_value the minimum possible value for an individual
+     * @param of a function to determine an individuals fitness
+     * @param maximize true if we are maximizing the objective function, false if we are minimizing it
+     */
+    public GA(int generation_counter, int max_value, int min_value, ObjectiveFunction of, boolean maximize)
+    {
+        this.generation_counter = generation_counter;
+        this.max_value = max_value;
+        this.min_value = min_value;
+        population = new ArrayList<String>();
+        this.objective_function = of;
+        this.maximize = maximize;
+        do_next_gen();
+    }
+
+    /**
+     * the main function, cycles through the reproduction, crossover, and mutation stages
+     */
+    private void do_next_gen()
+    {
+        init_population();
+        System.out.println("intial population");
+        print_population();
+
+        while (generation_counter > 0)
+        {
+            System.out.println("Reproduction " + (generation_counter));
+            reproduction();
+            print_population();
+            System.out.println("Crossover " + (generation_counter));
+            crossover(1.0);
+            mutation();
+            generation_counter--;
+            System.out.println("Population is now: ");
+            print_population();
+
+            // print the maximum value in the population if we are maximizing the function
+            if (maximize)
+            {
+                int of_max = 0;
+
+                for (String s : population)
+                {
+                    int curr_of = objective_function.fitness(s);
+                    if (curr_of > of_max)
+                    {
+                        of_max = curr_of;
+                    }
+                }
+                System.out.println("Max: " + of_max + "\n");
+            }
+            // print the minimum value in the population if we are minimizing the function
+            else
+            {
+                int of_min = Integer.MAX_VALUE;
+
+                for (String s : population)
+                {
+                    int curr_of = objective_function.fitness(s);
+                    if (curr_of < of_min)
+                    {
+                        of_min = curr_of;
+                    }
+                }
+                System.out.println("Min: " + of_min + "\n");
+            }
+        }
+
+    }
+
+    /**
+     * Creates the initial population
+     */
+    private void init_population()
+    {
+        bit_size = get_bit_size(max_value);
+        System.out.println("bit size: "+bit_size);
+        pop_size = (bit_size / 2) * 2;
+
+        if (pop_size < 4)
+        {
+            pop_size = 4;
+        }
+
+        while (population.size() < pop_size)
+        {
+            String current = "";
+
+            // method 2: randomly assigns each digit individually
+            while (current.length() < bit_size)
+            {
+                if (random.nextInt(2) == 1)
+                {
+                    current += "1";
+                }
+                else
+                {
+                    current += "0";
+                }
+            }
+
+            /*
+            // method 1: completely random number
+            String current = Integer.toBinaryString((int) (Math.random() * (max_value - min_value)) + min_value); 
+            current = pad_zero(current);*/
+ /*
+            // method 3: you have (pop_size / 2) 1s and (pop_size / 2) 0s to distribute for each index across the whole population
+            // population starts all 0s, then you pick n/2 random members, and set bit i = 0*/
+            // method 4: first sample has bit_size 1s, second sample has bit_size - 1 1s, etc.
+            // insert the new individual into the population if it is not already in the population, and it is within the acceptable range
+            if (!population.contains(current) && Integer.parseInt(current, 2) < max_value && Integer.parseInt(current, 2) > min_value)
+            {
+                population.add(current);
+            }
+        }
+    }
+
+    /**
+     * Adds padded 0s as necessary
+     */
+    private String pad_zero(String value)
+    {
+        while (value.length() < bit_size)
+        {
+            value = '0' + value;
+        }
+
+        return value;
+    }
+
+    /**
+     * Gets the number of bits in the binary representation of a given number
+     */
+    private int get_bit_size(int value)
+    {
+        return Integer.toBinaryString(value).length();
+    }
+
+    /**
+     * creates the next generation using a biased roulette based on objective function values
+     */
+    private void reproduction()
+    {
+        List<String> old_list = new ArrayList<String>();
+
+        for (String s : population)
+        {
+            if (!old_list.contains(s))
+            {
+                old_list.add(s);
+            }
+        }
+
+        population.clear();
+
+        // create new population using biased roulette to maximize objective function
+        if (maximize)
+        {
+            int sum = 0;
+
+            // get the total sum of objective function values
+            for (int i = 0; i < old_list.size(); i++)
+            {
+                sum += objective_function.fitness(old_list.get(i));
+            }
+
+            for (int i = 0; i < pop_size; i++)
+            {
+                // get the random number
+                int rand = random.nextInt(sum - 1);
+                int index = -1;
+
+                // find the value corresponding to the random number
+                while (rand >= 0)
+                {
+                    index++;
+                    rand -= objective_function.fitness(old_list.get(index));
+                }
+
+                // insert the winner of the biased roulette into the new population
+                population.add(old_list.get(index));
+            }
+        }
+        // create new population using biased roulette to minimize objective function
+        else
+        {
+            double sum = 0;
+
+            // get the total sum of objective function values
+            for (int i = 0; i < old_list.size(); i++)
+            {
+                sum += 1.000 / objective_function.fitness(old_list.get(i));
+            }
+
+            for (int i = 0; i < pop_size; i++)
+            {
+                // get the random number
+                double rand = Math.random() * sum;
+                int index = -1;
+
+                // find the value corresponding to the random number
+                while (rand >= 0)
+                {
+                    index++;
+                    rand -= 1.000 / objective_function.fitness(old_list.get(index));
+                }
+
+                // insert the winner of the biased roulette into the new population
+                population.add(old_list.get(index));
+            }
+        }
+    }
+
+    /**
+     * Crossover pairs of bit strings at a random crossover point
+     */
+    private void crossover(Double probability)
+    {
+        String new1;
+        String new2;
+
+        for (int i = 0; i < population.size(); i += 2)
+        {
+        	if(Math.random() < probability){
+	    		do
+	            {
+	                // get the crossover index
+	                int index = random.nextInt(bit_size - 1) + 1;
+	                System.out.println("Crossing over " + population.get(i) + " and " + population.get(i + 1) + " at index " + index);
+	
+	                // crossover the pair of strings
+	                new1 = population.get(i).substring(0, index) + population.get(i + 1).substring(index);
+	                new2 = population.get(i + 1).substring(0, index) + population.get(i).substring(index);
+	            }
+	            while (Integer.parseInt(new1, 2) < min_value || Integer.parseInt(new1, 2) > max_value
+	                    || Integer.parseInt(new2, 2) < min_value || Integer.parseInt(new2, 2) > max_value);
+	
+	            // insert the new values into the population
+	            population.set(i, new1);
+	            population.set(i + 1, new2);
+	        }
+        }
+    }
+
+    /**
+     * for every digit in the population, it is modified with a 0.1% chance
+     */
+    private void mutation()
+    {
+        for (int i = 0; i < population.size(); i++)
+        {
+            for (int j = 0; j < bit_size; j++)
+            {
+                if (random.nextInt(1000) == 1)
+                {
+                    System.out.println("Mutation!");
+                    char new_value = toggle(population.get(i).charAt(j));
+                    String new_str = population.get(i).substring(0, j) + new_value + population.get(i).substring(j + 1);
+
+                    // make sure the newly mutated sample is still an acceptable value before inserting it into the population
+                    if (Integer.parseInt(new_str, 2) < max_value && Integer.parseInt(new_str, 2) > min_value)
+                    {
+                        population.set(i, new_str);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 'Toggles' a value from 1 to 0 or 0 to 1
+     *
+     * @param num a 1 or 0 to be toggled
+     * @return 0 or 1
+     */
+    private char toggle(char num)
+    {
+        if (num == '1')
+        {
+            return '0';
+        }
+        else
+        {
+            return '1';
+        }
+    }
+
+    /**
+     * Prints the population's integer values and objective function values
+     */
+    private void print_population()
+    {
+        for (String s : population)
+        {
+            System.out.println(s + " (" + Integer.parseInt(s, 2) + ") = " + objective_function.fitness(s));
+        }
+        System.out.println("");
+    }
+}
