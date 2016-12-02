@@ -132,7 +132,7 @@ public class GA
             // population starts all 0s, then you pick n/2 random members, and set bit i = 0*/
             // method 4: first sample has bit_size 1s, second sample has bit_size - 1 1s, etc.
             // insert the new individual into the population if it is not already in the population, and it is within the acceptable range
-            if (!population.contains(current) && Integer.parseInt(current, 2) < max_value && Integer.parseInt(current, 2) > min_value)
+            if (!population.contains(current) && Integer.parseInt(current, 2) <= max_value && Integer.parseInt(current, 2) >= min_value)
             {
                 population.add(current);
             }
@@ -282,7 +282,7 @@ public class GA
                     String new_str = population.get(i).substring(0, j) + new_value + population.get(i).substring(j + 1);
 
                     // make sure the newly mutated sample is still an acceptable value before inserting it into the population
-                    if (Integer.parseInt(new_str, 2) < max_value && Integer.parseInt(new_str, 2) > min_value)
+                    if (Integer.parseInt(new_str, 2) <= max_value && Integer.parseInt(new_str, 2) >= min_value)
                     {
                         population.set(i, new_str);
                     }
