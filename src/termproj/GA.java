@@ -327,7 +327,7 @@ public class GA
     {
         for (String s : population)
         {
-            System.out.println(s + " (" + Integer.parseInt(s, 2) + ") = " + objective_function.fitness(s));
+            objective_function.print_value(s);
         }
         System.out.println("");
     }
