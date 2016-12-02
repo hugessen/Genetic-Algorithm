@@ -23,4 +23,11 @@ public class QuadraticFunction implements ObjectiveFunction
         int result = value * value;
         return result;
     }
+    
+    public void print_value(String binary)
+    {
+        int value = (Integer.parseInt(binary, 2) - 30);
+        int result = value * value;
+        System.out.printf("%s: x=%d, output=%d\n", binary, value, result);
+    }
 }
