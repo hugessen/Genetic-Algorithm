@@ -243,26 +243,37 @@ public class GA
         String new1;
         String new2;
 
-        for (int i = 0; i < population.size(); i += 2)
+        int i = 0;
+
+        while (i < population.size())
         {
-        	if(Math.random() < probability){
-	    		do
-	            {
-	                // get the crossover index
-	                int index = random.nextInt(bit_size - 1) + 1;
-	                System.out.println("Crossing over " + population.get(i) + " and " + population.get(i + 1) + " at index " + index);
-	
-	                // crossover the pair of strings
-	                new1 = population.get(i).substring(0, index) + population.get(i + 1).substring(index);
-	                new2 = population.get(i + 1).substring(0, index) + population.get(i).substring(index);
-	            }
-	            while (Integer.parseInt(new1, 2) < min_value || Integer.parseInt(new1, 2) > max_value
-	                    || Integer.parseInt(new2, 2) < min_value || Integer.parseInt(new2, 2) > max_value);
-	
-	            // insert the new values into the population
-	            population.set(i, new1);
-	            population.set(i + 1, new2);
-	        }
+            if (Math.random() < probability)
+            {
+                int count = 0;          
+                do
+                {
+                    // get the crossover index
+                    int index = random.nextInt(bit_size - 1) + 1;
+                    //System.out.println("Crossing over " + population.get(i) + " and " + population.get(i + 1) + " at index " + index);
+
+                    // crossover the pair of strings
+                    new1 = population.get(i).substring(0, index) + population.get(i + 1).substring(index);
+                    new2 = population.get(i + 1).substring(0, index) + population.get(i).substring(index);
+                    count++; 
+                }
+                while ((Integer.parseInt(new1, 2) < min_value || Integer.parseInt(new1, 2) > max_value
+                        || Integer.parseInt(new2, 2) < min_value || Integer.parseInt(new2, 2) > max_value)
+                        && count < bit_size);
+
+                // insert the new values into the population
+                if (count < bit_size)
+                {
+                    population.set(i, new1);
+                    population.set(i + 1, new2);
+                }
+
+                i += 2;
+            }
         }
     }
 
