@@ -234,12 +234,34 @@ public class GA
         // create new population using biased roulette to minimize objective function
         else
         {
+            double of_total = 0;
+            double p[] = new double[old_list.size()];
+            int fit[] = new int[old_list.size()];
             double sum = 0;
 
             // get the total sum of objective function values
             for (int i = 0; i < old_list.size(); i++)
             {
-                sum += 1.000 / objective_function.fitness(old_list.get(i));
+                fit[i] = objective_function.fitness(old_list.get(i));
+                if (fit[i] > 0)
+                {
+                    p[i] = 1.000 / fit[i];
+                }
+                of_total += p[i];
+            }
+
+            // get the total sum of objective function values
+            for (int i = 0; i < old_list.size(); i++)
+            {
+                if (fit[i] == 0)
+                {
+                    p[i] = 1;
+                }
+                else
+                {
+                    p[i] = p[i] / of_total;
+                }
+                sum += p[i];
             }
 
             for (int i = 0; i < pop_size; i++)
@@ -252,7 +274,7 @@ public class GA
                 while (rand >= 0)
                 {
                     index++;
-                    rand -= 1.000 / objective_function.fitness(old_list.get(index));
+                    rand -= p[index];
                 }
 
                 // insert the winner of the biased roulette into the new population
