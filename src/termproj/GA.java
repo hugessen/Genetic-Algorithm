@@ -42,7 +42,7 @@ public class GA
      */
     private void do_next_gen()
     {
-        init_population();
+        init_population(4);
         System.out.println("intial population");
         print_population();
 
@@ -95,15 +95,18 @@ public class GA
     /**
      * Creates the initial population
      */
-    private void init_population()
+    private void init_population(int m)
     {
+        int n = 0;
+        int r = 0;
+        
         bit_size = get_bit_size(max_value);
         System.out.println("bit size: "+bit_size);
         pop_size = (bit_size / 2) * 2;
 
-        if (pop_size < 4)
+        if (pop_size < 6)
         {
-            pop_size = 4;
+            pop_size = 6;
         }
 
         while (population.size() < pop_size)
@@ -111,26 +114,49 @@ public class GA
             String current = "";
 
             // method 2: randomly assigns each digit individually
-            while (current.length() < bit_size)
+            if (m == 2)
             {
-                if (random.nextInt(2) == 1)
+                while (current.length() < bit_size)
                 {
-                    current += "1";
+                    if (random.nextInt(2) == 1)
+                    {
+                        current += "1";
+                    }
+                    else
+                    {
+                        current += "0";
+                    }
                 }
-                else
+            }
+            // method 4: first sample has bit_size 1s, second sample has bit_size - 1 1s, etc.
+            else if (m == 4)
+            {
+                // create a string all all 0s
+                while (current.length() < bit_size)
                 {
                     current += "0";
                 }
-            }
 
-            /*
+                int i = 0;
+                // randomly assign between 0 and bit_size 1s into the string
+                while (i < n % bit_size)
+                {
+                    r = random.nextInt(bit_size);
+                    if (current.charAt(r) == '0')
+                    {
+                        current = current.substring(0, r) + "1" + current.substring(r + 1);
+                        i++;
+                    }
+                }                
+                n++;
+            }
             // method 1: completely random number
-            String current = Integer.toBinaryString((int) (Math.random() * (max_value - min_value)) + min_value); 
-            current = pad_zero(current);*/
- /*
-            // method 3: you have (pop_size / 2) 1s and (pop_size / 2) 0s to distribute for each index across the whole population
-            // population starts all 0s, then you pick n/2 random members, and set bit i = 0*/
-            // method 4: first sample has bit_size 1s, second sample has bit_size - 1 1s, etc.
+            else
+            {       
+                current = Integer.toBinaryString((int) (Math.random() * (max_value - min_value)) + min_value); 
+                current = pad_zero(current);
+            }
+            
             // insert the new individual into the population if it is not already in the population, and it is within the acceptable range
             if (!population.contains(current) && Integer.parseInt(current, 2) <= max_value && Integer.parseInt(current, 2) >= min_value)
             {
