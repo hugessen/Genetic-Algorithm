@@ -34,5 +34,11 @@ public class Driver
 	        	Himmelblau of = new Himmelblau();
 	        	GA ga = new GA(num_gen, (int)Math.pow(2, 16)-1, 0, of, false,excel_mode);
 	        }
+	    else if (of_case == 3) //De Jong Sphere function
+        {
+            int n = 4;
+            DeJongSphere of = new DeJongSphere(n);
+            GA ga = new GA(num_gen, (int) Math.pow(2, n * 7) - 1, 0, of, false);
+        }
     }
 }
