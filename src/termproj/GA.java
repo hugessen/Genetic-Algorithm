@@ -69,11 +69,11 @@ public class GA
             // print the maximum value in the population if we are maximizing the function
             if (maximize)
             {
-                int of_max = 0;
+                double of_max = 0;
 
                 for (String s : population)
                 {
-                    int curr_of = objective_function.fitness(s);
+                    double curr_of = objective_function.fitness(s);
                     if (curr_of > of_max)
                     {
                         of_max = curr_of;
@@ -82,16 +82,16 @@ public class GA
                 if(!excel_mode)
                 	System.out.print("Max: ");
                 if(!excel_mode || generation_counter == 0)
-                	System.out.println(of_max);
+                	System.out.printf("%.2f \n",of_max);
             }
             // print the minimum value in the population if we are minimizing the function
             else
             {
-                int of_min = Integer.MAX_VALUE;
+                double of_min = Integer.MAX_VALUE;
 
                 for (String s : population)
                 {
-                    int curr_of = objective_function.fitness(s);
+                    double curr_of = objective_function.fitness(s);
                     if (curr_of < of_min)
                     {
                         of_min = curr_of;
@@ -100,7 +100,7 @@ public class GA
                 if(!excel_mode)
                 	System.out.print("Min: ");
                 if(!excel_mode || generation_counter == 0)
-                	System.out.println(of_min);
+                	System.out.printf("%.2f \n",of_min);
             }
         }
     }
@@ -250,7 +250,7 @@ public class GA
         {
             double of_total = 0;
             double p[] = new double[old_list.size()];
-            int fit[] = new int[old_list.size()];
+            double fit[] = new double[old_list.size()];
             double sum = 0;
 
             // get the total sum of objective function values

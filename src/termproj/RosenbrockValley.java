@@ -21,7 +21,7 @@ public class RosenbrockValley implements ObjectiveFunction
     }
 
     @Override
-    public int fitness(String binary)
+    public double fitness(String binary)
     {
         // x is the first half of the string
         double x = Integer.parseInt(binary.substring(0, binary.length() / 2), 2);
@@ -31,7 +31,7 @@ public class RosenbrockValley implements ObjectiveFunction
         double y = Integer.parseInt(binary.substring(binary.length() / 2), 2);
         y = (y - 31) / 8.00;
 
-        int value = (int)Math.ceil(Math.pow(a - x, 2) + b * Math.pow((y - Math.pow(x, 2)),2));
+        double value = Math.ceil(Math.pow(a - x, 2) + b * Math.pow((y - Math.pow(x, 2)),2));
         
         return value;
     }

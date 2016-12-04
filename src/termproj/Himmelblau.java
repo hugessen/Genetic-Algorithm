@@ -4,7 +4,7 @@ public class Himmelblau implements ObjectiveFunction {
 	
 	
 	@Override
-    public int fitness(String binary)
+    public double fitness(String binary)
     {
 		//First half of binary number
 		double x = Integer.parseInt(binary.substring(0, binary.length() / 2), 2);
@@ -15,7 +15,7 @@ public class Himmelblau implements ObjectiveFunction {
 		double y = Integer.parseInt(binary.substring(binary.length() / 2), 2);
 		y = (y - 127) / 32.00;
 		
-		int value=(int)(Math.pow(Math.pow(x,2) + y - 11 ,2) + Math.pow(x + Math.pow(y, 2) -7, 2));
+		double value= (Math.pow(Math.pow(x,2) + y - 11 ,2) + Math.pow(x + Math.pow(y, 2) -7, 2));
 		
 		return value;
 				

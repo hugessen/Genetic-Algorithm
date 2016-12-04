@@ -17,7 +17,7 @@ public class QuadraticFunction implements ObjectiveFunction
     }
 
     @Override
-    public int fitness(String binary)
+    public double fitness(String binary)
     {
         int value = (Integer.parseInt(binary, 2) - 30) * -1;
         int result = value * value;

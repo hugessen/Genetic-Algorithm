@@ -11,6 +11,6 @@ package termproj;
  */
 public interface ObjectiveFunction
 {
-    public int fitness(String binary);
+    public double fitness(String binary);
     public void print_value(String binary);
 }
