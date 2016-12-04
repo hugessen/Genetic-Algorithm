@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class GA
 {
-
+	boolean excel_mode;
     int generation_counter; // the number of generations remaining
     int max_value; // the maximum possible value for an individual
     int min_value; // the minimum possible value for an individual
@@ -26,7 +26,7 @@ public class GA
      * @param of a function to determine an individuals fitness
      * @param maximize true if we are maximizing the objective function, false if we are minimizing it
      */
-    public GA(int generation_counter, int max_value, int min_value, ObjectiveFunction of, boolean maximize)
+    public GA(int generation_counter, int max_value, int min_value, ObjectiveFunction of, boolean maximize,boolean excel_mode)
     {
         this.generation_counter = generation_counter;
         this.max_value = max_value;
@@ -34,6 +34,7 @@ public class GA
         population = new ArrayList<String>();
         this.objective_function = of;
         this.maximize = maximize;
+        this.excel_mode = excel_mode;
         do_next_gen();
     }
 
@@ -43,20 +44,27 @@ public class GA
     private void do_next_gen()
     {
         init_population(4);
-        System.out.println("intial population");
-        print_population();
+        if(!excel_mode){
+        	System.out.println("intial population");
+        	print_population();
+        }
 
         while (generation_counter > 0)
         {
-            System.out.println("Reproduction " + (generation_counter));
+        	if(!excel_mode)
+        		System.out.println("Reproduction " + (generation_counter));
             reproduction();
-            print_population();
-            System.out.println("Crossover " + (generation_counter));
+            if(!excel_mode){
+            	print_population();
+            	System.out.println("Crossover " + (generation_counter));
+            }
             crossover(1.0);
             mutation();
             generation_counter--;
-            System.out.println("Population is now: ");
-            print_population();
+            if(!excel_mode){
+	            System.out.println("Population is now: ");
+	            print_population();
+            }
 
             // print the maximum value in the population if we are maximizing the function
             if (maximize)
@@ -71,7 +79,10 @@ public class GA
                         of_max = curr_of;
                     }
                 }
-                System.out.println("Max: " + of_max + "\n");
+                if(!excel_mode)
+                	System.out.print("Max: ");
+                if(!excel_mode || generation_counter == 0)
+                	System.out.println(of_max);
             }
             // print the minimum value in the population if we are minimizing the function
             else
@@ -86,10 +97,12 @@ public class GA
                         of_min = curr_of;
                     }
                 }
-                System.out.println("Min: " + of_min + "\n");
+                if(!excel_mode)
+                	System.out.print("Min: ");
+                if(!excel_mode || generation_counter == 0)
+                	System.out.println(of_min);
             }
         }
-
     }
 
     /**
@@ -101,7 +114,8 @@ public class GA
         int r = 0;
         
         bit_size = get_bit_size(max_value);
-        System.out.println("bit size: "+bit_size);
+        if(!excel_mode)
+        	System.out.println("bit size: "+bit_size);
         pop_size = (bit_size / 2) * 2;
 
         if (pop_size < 6)
@@ -336,7 +350,8 @@ public class GA
             {
                 if (random.nextInt(1000) == 1)
                 {
-                    System.out.println("Mutation!");
+                	if(!excel_mode)
+                		System.out.println("Mutation!");
                     char new_value = toggle(population.get(i).charAt(j));
                     String new_str = population.get(i).substring(0, j) + new_value + population.get(i).substring(j + 1);
 
@@ -377,6 +392,6 @@ public class GA
         {
             objective_function.print_value(s);
         }
-        System.out.println("");
+    	System.out.println("");
     }
 }
