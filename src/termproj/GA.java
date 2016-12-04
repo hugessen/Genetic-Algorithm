@@ -6,7 +6,6 @@ import java.util.Random;
 
 public class GA
 {
-	boolean excel_mode;
     int generation_counter; // the number of generations remaining
     int max_value; // the maximum possible value for an individual
     int min_value; // the minimum possible value for an individual
@@ -26,7 +25,7 @@ public class GA
      * @param of a function to determine an individuals fitness
      * @param maximize true if we are maximizing the objective function, false if we are minimizing it
      */
-    public GA(int generation_counter, int max_value, int min_value, ObjectiveFunction of, boolean maximize,boolean excel_mode)
+    public GA(int generation_counter, int max_value, int min_value, ObjectiveFunction of, boolean maximize)
     {
         this.generation_counter = generation_counter;
         this.max_value = max_value;
@@ -34,7 +33,6 @@ public class GA
         population = new ArrayList<String>();
         this.objective_function = of;
         this.maximize = maximize;
-        this.excel_mode = excel_mode;
         do_next_gen();
     }
 
@@ -43,25 +41,25 @@ public class GA
      */
     private void do_next_gen()
     {
-        init_population(4);
-        if(!excel_mode){
+        init_population(2);
+        if(!Driver.excel_mode){
         	System.out.println("intial population");
         	print_population();
         }
 
         while (generation_counter > 0)
         {
-        	if(!excel_mode)
+        	if(!Driver.excel_mode)
         		System.out.println("Reproduction " + (generation_counter));
             reproduction();
-            if(!excel_mode){
+            if(!Driver.excel_mode){
             	print_population();
             	System.out.println("Crossover " + (generation_counter));
             }
             crossover(1.0);
             mutation();
             generation_counter--;
-            if(!excel_mode){
+            if(!Driver.excel_mode){
 	            System.out.println("Population is now: ");
 	            print_population();
             }
@@ -79,9 +77,9 @@ public class GA
                         of_max = curr_of;
                     }
                 }
-                if(!excel_mode)
+                if(!Driver.excel_mode)
                 	System.out.print("Max: ");
-                if(!excel_mode || generation_counter == 0)
+                if(!Driver.excel_mode || generation_counter == 0)
                 	System.out.printf("%.2f \n",of_max);
             }
             // print the minimum value in the population if we are minimizing the function
@@ -97,9 +95,9 @@ public class GA
                         of_min = curr_of;
                     }
                 }
-                if(!excel_mode) 
+                if(!Driver.excel_mode) 
                 	System.out.print("Min: ");
-                if(!excel_mode || generation_counter == 0)
+                if(!Driver.excel_mode || generation_counter == 0)
                 	System.out.printf("%.2f \n",of_min);
             }
         }
@@ -114,13 +112,13 @@ public class GA
         int r = 0;
         
         bit_size = get_bit_size(max_value);
-        if(!excel_mode)
+        if(!Driver.excel_mode)
         	System.out.println("bit size: "+bit_size);
         pop_size = (bit_size / 2) * 2;
 
-        if (pop_size < 6)
+        if (pop_size < 20)
         {
-            pop_size = 6;
+            pop_size = 20;
         }
 
         while (population.size() < pop_size)
@@ -350,7 +348,7 @@ public class GA
             {
                 if (random.nextInt(1000) == 1)
                 {
-                	if(!excel_mode)
+                	if(!Driver.excel_mode)
                 		System.out.println("Mutation!");
                     char new_value = toggle(population.get(i).charAt(j));
                     String new_str = population.get(i).substring(0, j) + new_value + population.get(i).substring(j + 1);
