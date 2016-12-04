@@ -32,7 +32,7 @@ public class Driver
 	        else if (of_case == 2) //Himmelblau Function
 	        {
 	        	Himmelblau of = new Himmelblau();
-	        	GA ga = new GA(num_gen, (int)Math.pow(2, 12)-1, 0, of, false,excel_mode);
+	        	GA ga = new GA(num_gen, (int)Math.pow(2, 16)-1, 0, of, false,excel_mode);
 	        }
     }
 }
