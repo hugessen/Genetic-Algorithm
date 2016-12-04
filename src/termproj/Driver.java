@@ -14,11 +14,16 @@ public class Driver
         boolean excel_mode = false;
         int num_iterations;
         if(excel_mode)
+	{
         	num_iterations = 10000;
+	}
         else
+	{
         	num_iterations = 1;
+	}
         
         for(int i = 0; i < num_iterations; i++)
+	{
 	        if (of_case == 0) //Quadratic Function
 	        {
 	            QuadraticFunction of = new QuadraticFunction();
@@ -34,11 +39,12 @@ public class Driver
 	        	Himmelblau of = new Himmelblau();
 	        	GA ga = new GA(num_gen, (int)Math.pow(2, 16)-1, 0, of, false,excel_mode);
 	        }
-	    else if (of_case == 3) //De Jong Sphere function
-        {
-            int n = 4;
-            DeJongSphere of = new DeJongSphere(n);
-            GA ga = new GA(num_gen, (int) Math.pow(2, n * 7) - 1, 0, of, false);
-        }
+		else if (of_case == 3) //De Jong Sphere function
+		{
+		    int n = 4;
+		    DeJongSphere of = new DeJongSphere(n);
+		    GA ga = new GA(num_gen, (int) Math.pow(2, n * 7) - 1, 0, of, false);
+		}
+	}
     }
 }
