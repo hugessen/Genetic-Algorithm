@@ -43,7 +43,7 @@ public class RosenbrockValley implements ObjectiveFunction
         x = (x - 31) / 8.00;
         
         // y is the second half of the string
-        double y = Integer.parseInt(binary.substring((binary.length() / 2) + 1), 2);
+        double y = Integer.parseInt(binary.substring((binary.length() / 2)), 2);
         y = (y - 31) / 8.00;
 
         int value = (int)Math.ceil(Math.pow(a - x, 2) + b * Math.pow((y - Math.pow(x, 2)),2));
