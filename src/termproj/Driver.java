@@ -1,29 +1,40 @@
 package termproj;
 
-// TODO:
-// implement other objective functions
-// Test effectiveness of different combinations of initial settings
-
 public class Driver
 {
 
     public static void main(String[] args)
     {
-        int of_case = 2;
+        int of_case;
         int num_gen = 50;
         boolean excel_mode = false;
-        int num_iterations;
-        if(excel_mode)
+	Scanner r;
+        String s = "";
+
+	do 
 	{
-        	num_iterations = 10000;
-	}
-        else
-	{
-        	num_iterations = 1;
-	}
-        
-        for(int i = 0; i < num_iterations; i++)
-	{
+		of_case = -1;
+		
+		while (of_case < 0 || of_case > 4)
+		{
+			r = new Scanner(System.in);
+			System.out.println("Enter the number of the function you want to run: ");
+			System.out.println("1 - Rosenbrock Valley");
+			System.out.println("2 - Himmelblau");
+			System.out.println("3 - De Jong Sphere");
+			System.out.println("4 - Quit");
+
+			s = r.next();
+			if (Character.isDigit(s.charAt(0)))
+			{
+				of_case = Integer.parseInt(s, 10);
+			}
+			else
+			{
+				System.out.println("Invalid input, try again");
+			}
+		}
+		
 	        if (of_case == 0) //Quadratic Function
 	        {
 	            QuadraticFunction of = new QuadraticFunction();
@@ -45,6 +56,6 @@ public class Driver
 		    DeJongSphere of = new DeJongSphere(n);
 		    GA ga = new GA(num_gen, (int) Math.pow(2, n * 7) - 1, 0, of, false);
 		}
-	}
+	} while (of_case != 4);
     }
 }
