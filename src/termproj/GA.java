@@ -97,7 +97,7 @@ public class GA
                         of_min = curr_of;
                     }
                 }
-                if(!excel_mode)
+                if(!excel_mode) 
                 	System.out.print("Min: ");
                 if(!excel_mode || generation_counter == 0)
                 	System.out.printf("%.2f \n",of_min);
