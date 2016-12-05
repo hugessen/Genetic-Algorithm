@@ -6,13 +6,19 @@ import java.util.Random;
 
 public class GA
 {
-	boolean excel_mode;
+    double MUTATION_RATE = 0.03;
+    int INITIAL_GEN_METHOD = 3;
+    int GEN_COUNT = 40;
+
+    boolean excel_mode;
     int generation_counter; // the number of generations remaining
     int max_value; // the maximum possible value for an individual
     int min_value; // the minimum possible value for an individual
     int bit_size; // the number of bits in an individual
     int pop_size; // the number of individuals in a population
     List<String> population; // the population, with each individual represented by a string
+    String fittest; // the string producing the best objective function
+    int fittest_gen; // the generation producing the fittest individual
     Random random = new Random(); // used to generate random numbers
     ObjectiveFunction objective_function; // a function to determine an individuals fitness
     boolean maximize; // true if we are maximizing the objective function, false if we are minimizing it
@@ -26,9 +32,8 @@ public class GA
      * @param of a function to determine an individuals fitness
      * @param maximize true if we are maximizing the objective function, false if we are minimizing it
      */
-    public GA(int generation_counter, int max_value, int min_value, ObjectiveFunction of, boolean maximize,boolean excel_mode)
+    public GA(int max_value, ObjectiveFunction of, boolean maximize, boolean excel_mode)
     {
-        this.generation_counter = generation_counter;
         this.max_value = max_value;
         this.min_value = min_value;
         population = new ArrayList<String>();
@@ -43,65 +48,82 @@ public class GA
      */
     private void do_next_gen()
     {
-        init_population(4);
-        if(!excel_mode){
-        	System.out.println("intial population");
-        	print_population();
+        init_population(INITIAL_GEN_METHOD);
+        fittest = population.get(0);
+        fittest_gen = 0;
+
+        if (!excel_mode)
+        {
+            System.out.println("Initial Population");
+            print_population();
         }
 
-        while (generation_counter > 0)
+        while (generation_counter < GEN_COUNT)
         {
-        	if(!excel_mode)
-        		System.out.println("Reproduction " + (generation_counter));
-            reproduction();
-            if(!excel_mode){
-            	print_population();
-            	System.out.println("Crossover " + (generation_counter));
+            if (!excel_mode)
+            {
+                System.out.println("Reproduction " + (generation_counter));
             }
-            crossover(1.0);
-            mutation();
-            generation_counter--;
-            if(!excel_mode){
-	            System.out.println("Population is now: ");
-	            print_population();
+            reproduction();
+            
+            if (!excel_mode)
+            {
+                System.out.println("Crossover " + (generation_counter));
+            }
+            crossover();
+            
+            if (!excel_mode)
+            {
+                System.out.println("Mutation " + (generation_counter));
+            }
+            mutation(MUTATION_RATE);
+
+            if (!excel_mode)
+            {
+                System.out.printf("Generation %d population is now:\n", generation_counter);
+                print_population();
             }
 
-            // print the maximum value in the population if we are maximizing the function
+            // check if we have found the new fittest individual
+            for (String s : population)
+            {
+                if (maximize)
+                {
+                    if (objective_function.fitness(s) > objective_function.fitness(fittest))
+                    {
+                        fittest = s;
+                        fittest_gen = generation_counter;
+                    }
+                }
+                else if (objective_function.fitness(s) < objective_function.fitness(fittest))
+                {
+                    fittest = s;
+                    fittest_gen = generation_counter;
+                }
+            }
+
+            generation_counter++;
+        }
+
+        if (!excel_mode)
+        {
             if (maximize)
             {
-                double of_max = 0;
+                System.out.printf("The maximium value was %.2f, first seen in generation %d\nObtained from: ", objective_function.fitness(fittest), fittest_gen);
+                objective_function.print_value(fittest);
+                System.out.println("");
 
-                for (String s : population)
-                {
-                    double curr_of = objective_function.fitness(s);
-                    if (curr_of > of_max)
-                    {
-                        of_max = curr_of;
-                    }
-                }
-                if(!excel_mode)
-                	System.out.print("Max: ");
-                if(!excel_mode || generation_counter == 0)
-                	System.out.printf("%.2f \n",of_max);
             }
-            // print the minimum value in the population if we are minimizing the function
             else
             {
-                double of_min = Integer.MAX_VALUE;
-
-                for (String s : population)
-                {
-                    double curr_of = objective_function.fitness(s);
-                    if (curr_of < of_min)
-                    {
-                        of_min = curr_of;
-                    }
-                }
-                if(!excel_mode) 
-                	System.out.print("Min: ");
-                if(!excel_mode || generation_counter == 0)
-                	System.out.printf("%.2f \n",of_min);
+                System.out.printf("The minimium value was %.2f, first seen in generation %d\nObtained from: ", objective_function.fitness(fittest), fittest_gen);
+                objective_function.print_value(fittest);
+                System.out.println("");
             }
+        }
+        else
+        {
+            System.out.printf(".2f", objective_function.fitness(fittest));
         }
     }
 
@@ -110,22 +132,25 @@ public class GA
      */
     private void init_population(int m)
     {
+        String current;
         int n = 0;
         int r = 0;
-        
-        bit_size = get_bit_size(max_value);
-        if(!excel_mode)
-        	System.out.println("bit size: "+bit_size);
-        pop_size = (bit_size / 2) * 2;
 
-        if (pop_size < 6)
+        bit_size = get_bit_size(max_value);
+        if (!excel_mode)
         {
-            pop_size = 6;
+            System.out.println("bit size: " + bit_size);
+        }
+        pop_size = (bit_size / 2) * 4;
+
+        if (pop_size < 10)
+        {
+            pop_size = 10;
         }
 
         while (population.size() < pop_size)
         {
-            String current = "";
+            current = "";
 
             // method 2: randomly assigns each digit individually
             if (m == 2)
@@ -161,21 +186,60 @@ public class GA
                         current = current.substring(0, r) + "1" + current.substring(r + 1);
                         i++;
                     }
-                }                
+                }
                 n++;
             }
             // method 1: completely random number
             else
-            {       
-                current = Integer.toBinaryString((int) (Math.random() * (max_value - min_value)) + min_value); 
+            {
+                current = Integer.toBinaryString((int) (Math.random() * (max_value - min_value)) + min_value);
                 current = pad_zero(current);
             }
-            
+
             // insert the new individual into the population if it is not already in the population, and it is within the acceptable range
             if (!population.contains(current) && Integer.parseInt(current, 2) <= max_value && Integer.parseInt(current, 2) >= min_value)
             {
                 population.add(current);
             }
+        }
+
+        // method 3: you have (pop_size / 2) 1s and (pop_size / 2) 0s to distribute for each index across the whole population
+        if (m == 3)
+        {
+            for (int i = 0; i < population.size(); i++)
+            {
+                current = "";
+
+                // create a string all all 0s
+                while (current.length() < bit_size)
+                {
+                    current += "0";
+                }
+
+                population.set(i, current);
+            }
+
+            //pick size/2 random members, and set bit i = 0
+            for (int i = 0; i < bit_size; i++)
+            {
+                n = 0;
+                r = 0;
+                while (n < population.size() / 2)
+                {
+                    r = random.nextInt(population.size());
+                    if (population.get(r).charAt(i) == '0')
+                    {
+                        current = population.get(r);
+                        current = current.substring(0, i) + "1" + current.substring(i + 1);
+                        if (Integer.parseInt(current, 2) >= min_value && Integer.parseInt(current, 2) <= max_value)
+                        {
+                            population.set(r, current);
+                            n++;
+                        }
+                    }
+                }
+            }
+
         }
     }
 
@@ -300,7 +364,7 @@ public class GA
     /**
      * Crossover pairs of bit strings at a random crossover point
      */
-    private void crossover(Double probability)
+    private void crossover()
     {
         String new1;
         String new2;
@@ -309,49 +373,49 @@ public class GA
 
         while (i < population.size())
         {
-            if (Math.random() < probability)
+
+            int count = 0;
+            do
             {
-                int count = 0;          
-                do
-                {
-                    // get the crossover index
-                    int index = random.nextInt(bit_size - 1) + 1;
-                    //System.out.println("Crossing over " + population.get(i) + " and " + population.get(i + 1) + " at index " + index);
+                // get the crossover index
+                int index = random.nextInt(bit_size - 1) + 1;
+                //System.out.println("Crossing over " + population.get(i) + " and " + population.get(i + 1) + " at index " + index);
 
-                    // crossover the pair of strings
-                    new1 = population.get(i).substring(0, index) + population.get(i + 1).substring(index);
-                    new2 = population.get(i + 1).substring(0, index) + population.get(i).substring(index);
-                    count++; 
-                }
-                while ((Integer.parseInt(new1, 2) < min_value || Integer.parseInt(new1, 2) > max_value
-                        || Integer.parseInt(new2, 2) < min_value || Integer.parseInt(new2, 2) > max_value)
-                        && count < bit_size);
-
-                // insert the new values into the population
-                if (count < bit_size)
-                {
-                    population.set(i, new1);
-                    population.set(i + 1, new2);
-                }
-
-                i += 2;
+                // crossover the pair of strings
+                new1 = population.get(i).substring(0, index) + population.get(i + 1).substring(index);
+                new2 = population.get(i + 1).substring(0, index) + population.get(i).substring(index);
+                count++;
             }
+            while ((Integer.parseInt(new1, 2) < min_value || Integer.parseInt(new1, 2) > max_value
+                    || Integer.parseInt(new2, 2) < min_value || Integer.parseInt(new2, 2) > max_value)
+                    && count < bit_size);
+
+            // insert the new values into the population
+            if (count < bit_size)
+            {
+                population.set(i, new1);
+                population.set(i + 1, new2);
+            }
+
+            i += 2;
         }
     }
 
     /**
      * for every digit in the population, it is modified with a 0.1% chance
      */
-    private void mutation()
+    private void mutation(double p)
     {
         for (int i = 0; i < population.size(); i++)
         {
             for (int j = 0; j < bit_size; j++)
             {
-                if (random.nextInt(1000) == 1)
+                if (Math.random() <= p)
                 {
-                	if(!excel_mode)
-                		System.out.println("Mutation!");
+                    if (!excel_mode)
+                    {
+                        System.out.println("Mutation!");
+                    }
                     char new_value = toggle(population.get(i).charAt(j));
                     String new_str = population.get(i).substring(0, j) + new_value + population.get(i).substring(j + 1);
 
@@ -392,6 +456,6 @@ public class GA
         {
             objective_function.print_value(s);
         }
-    	System.out.println("");
+        System.out.println("");
     }
 }
