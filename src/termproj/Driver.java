@@ -7,7 +7,7 @@ package termproj;
 public class Driver
 {
 
-    public static boolean excel_mode = true;
+    public static boolean excel_mode = false;
 
 	public static void main(String[] args)
     {
