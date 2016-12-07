@@ -8,7 +8,6 @@ public class GA
 {
     double MUTATION_RATE = 0.03;
     int INITIAL_GEN_METHOD = 3;
-    int GEN_COUNT = 40;
 
     boolean excel_mode;
     int generation_counter; // the number of generations remaining
@@ -16,6 +15,7 @@ public class GA
     int min_value; // the minimum possible value for an individual
     int bit_size; // the number of bits in an individual
     int pop_size; // the number of individuals in a population
+    double gen_best;
     List<String> population; // the population, with each individual represented by a string
     String fittest; // the string producing the best objective function
     int fittest_gen; // the generation producing the fittest individual
@@ -32,14 +32,13 @@ public class GA
      * @param of a function to determine an individuals fitness
      * @param maximize true if we are maximizing the objective function, false if we are minimizing it
      */
-    public GA(int max_value, ObjectiveFunction of, boolean maximize, boolean excel_mode)
+    public GA(int max_value, ObjectiveFunction of, boolean maximize)
     {
         this.max_value = max_value;
         this.min_value = min_value;
         population = new ArrayList<String>();
         this.objective_function = of;
         this.maximize = maximize;
-        this.excel_mode = excel_mode;
         do_next_gen();
     }
 
@@ -52,60 +51,74 @@ public class GA
         fittest = population.get(0);
         fittest_gen = 0;
 
-        if (!excel_mode)
+        if (!Driver.excel_mode)
         {
             System.out.println("Initial Population");
             print_population();
         }
 
-        while (generation_counter < GEN_COUNT)
+        while (generation_counter < Driver.GEN_COUNT)
         {
-            if (!excel_mode)
+            if (!Driver.excel_mode)
             {
                 System.out.println("Reproduction " + (generation_counter));
             }
             reproduction();
             
-            if (!excel_mode)
+            if (!Driver.excel_mode)
             {
                 System.out.println("Crossover " + (generation_counter));
             }
             crossover();
             
-            if (!excel_mode)
+            if (!Driver.excel_mode)
             {
                 System.out.println("Mutation " + (generation_counter));
             }
             mutation(MUTATION_RATE);
 
-            if (!excel_mode)
+            if (!Driver.excel_mode)
             {
                 System.out.printf("Generation %d population is now:\n", generation_counter);
                 print_population();
             }
 
+            
+            if(maximize)
+            	gen_best = 0;
+            else
+            	gen_best = Integer.MAX_VALUE;
             // check if we have found the new fittest individual
             for (String s : population)
             {
                 if (maximize)
                 {
+                	//Find the best from each generation
+                	if(Driver.excel_mode && (objective_function.fitness(s) > gen_best))
+                		gen_best = objective_function.fitness(s);
+                		
                     if (objective_function.fitness(s) > objective_function.fitness(fittest))
                     {
                         fittest = s;
                         fittest_gen = generation_counter;
                     }
                 }
-                else if (objective_function.fitness(s) < objective_function.fitness(fittest))
-                {
-                    fittest = s;
-                    fittest_gen = generation_counter;
+                else { 
+                	
+                	if(Driver.excel_mode && (objective_function.fitness(s) < gen_best))
+                		gen_best = objective_function.fitness(s);
+                	
+                	if (objective_function.fitness(s) < objective_function.fitness(fittest)){
+	                    fittest = s;
+	                    fittest_gen = generation_counter;
+                	}
                 }
             }
-
+            Driver.gen_best[generation_counter] += gen_best;
             generation_counter++;
         }
 
-        if (!excel_mode)
+        if (!Driver.excel_mode)
         {
             if (maximize)
             {
@@ -123,7 +136,7 @@ public class GA
         }
         else
         {
-            System.out.printf(".2f", objective_function.fitness(fittest));
+//            System.out.printf("%.2f \n", objective_function.fitness(fittest));
         }
     }
 
@@ -137,7 +150,7 @@ public class GA
         int r = 0;
 
         bit_size = get_bit_size(max_value);
-        if (!excel_mode)
+        if (!Driver.excel_mode)
         {
             System.out.println("bit size: " + bit_size);
         }
@@ -412,7 +425,7 @@ public class GA
             {
                 if (Math.random() <= p)
                 {
-                    if (!excel_mode)
+                    if (!Driver.excel_mode)
                     {
                         System.out.println("Mutation!");
                     }
