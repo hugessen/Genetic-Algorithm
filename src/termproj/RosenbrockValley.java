@@ -31,7 +31,7 @@ public class RosenbrockValley implements ObjectiveFunction
         double y = Integer.parseInt(binary.substring(binary.length() / 2), 2);
         y = (y - 31) / 8.00;
 
-        double value = Math.ceil(Math.pow(a - x, 2) + b * Math.pow((y - Math.pow(x, 2)),2));
+        double value = Math.pow(a - x, 2) + b * Math.pow((y - Math.pow(x, 2)),2);
         
         return value;
     }
@@ -46,9 +46,9 @@ public class RosenbrockValley implements ObjectiveFunction
         double y = Integer.parseInt(binary.substring((binary.length() / 2)), 2);
         y = (y - 31) / 8.00;
 
-        int value = (int)Math.ceil(Math.pow(a - x, 2) + b * Math.pow((y - Math.pow(x, 2)),2));
+        double value = Math.pow(a - x, 2) + b * Math.pow((y - Math.pow(x, 2)),2);
         
-        System.out.printf("%s: x=%.2f, y=%.2f, output=%d\n", binary, x, y, value);
+        System.out.printf("%s: x=%.2f, y=%.2f, output=%.2f\n", binary, x, y, value);
     }
 
     
