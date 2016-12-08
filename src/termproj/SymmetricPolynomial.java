@@ -56,7 +56,7 @@ public class SymmetricPolynomial implements ObjectiveFunction
         {
             x[i] = Integer.parseInt(binary.substring((binary.length() / n) * i, (binary.length() / n) * (i + 1)), 2);
             x[i] = (x[i] - 1.5) / 1.5;
-            System.out.printf("x=%s=%.2f, ", binary.substring((binary.length() / n) * i, (binary.length() / n) * (i + 1)), x[i]);
+            System.out.printf("x%d=%s=%.2f, ", (i+1), binary.substring((binary.length() / n) * i, (binary.length() / n) * (i + 1)), x[i]);
         }
 
         // calculate values
